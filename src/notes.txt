@@ -1,0 +1,208 @@
+Finite Automata of Finite State Machine is an abstraction
+
+
+There're 3 types of state machines:
+
+- NFA
+  It's a nondetermenistic FA - a state machine, which allows transition from one state to other multiple states on the same symbol.
+  Pratcically it means that being in state 1 and consuming symbol "a" there can be multiple potential states to move further.
+  Having multiple choises - NFA traverse to all of them to consider maximum accepting paths.
+
+- e-NFA (epsilon NFA). Since it's NFA it again allows multiple transitions from the one state on the same symbol. epsilon transition allows
+  to move from one state to another without consuming a character from a string.
+
+- DFA
+  It's a determenistic FA. It forbids what we allow in NFA and e-NFA:
+   - there is only one transition from one state to another on one symbol;
+   - there is no epsilon transitions.
+
+These state machines are used to implement regular expressions.
+
+
+NFA is more complex than DFA.
+
+
+Each NFA can be converted to the DFA and each DFA can be converted to NFA. 
+
+If DFA is simpler than NFA and each NFA can be converted to DFA, why do we need NFA? The thing is 
+it's simpler to convert RegExp at first to e-NFA, and then eventually to convert e-NFA to DFA, wich in runtime will be much faster to execute.
+
+So, to represent RegExp as state machine it can be converted to NFA at first and after that it can be 
+converted further to DFA.
+
+Every state machine has set of states and transitions between these states. So State Machine is a graph with nodes and edges.
+
+Regular expression maps one to one to the state transitions in a state machine.
+
+Each state machine has:
+  - starting (initial) state;
+  - transitions from one state to another by consuming one symbol from a string.
+  - destination state - accepting state.
+
+When we traverse a graph, starting from an initial state, going through all state machine's transitions and reaching an accepting state - 
+the srtring is accepted.
+
+State Machine is a tupple of 5 elements:
+- Q - all possible states;
+- Σ - alphabet (all possible characters which can be used in our strings);
+- Δ - transition function.
+- q0 - starting state.
+- F - set of accepting states.
+
+Basic NFA fragments.
+
+To convert RegExps to the state machines we'll be using gradual implementation approach: 
+  - at first we create basic state machines - the main structural blocks; 
+  - after we create combound state machines, using these building blocks.
+
+The first basic machine - Single Character Machine.
+The second basic machine - Epsilon machine.
+
+These are the fundemental building blocks for everything else in regular expressions.
+Having different combinations of just these two machines we can build very complex machines - concatenation, repetition, character groups, classes and etc.
+
+
+
+
+
+#### RegExp machine ####
+
+State machine, that represents regular expressions literally tells us what symbols in what orders 
+we should take from the string sequentially. If there's such type of symbol in the string the machine tells us to take
+we can go further. If there's not such type of symbol in the string and we haven't reached an accepting state yet,
+the string is not satisfied the state machine and as result is not accepted.
+
+
+The goals of the current project are:
+
+  - to convert RegExp pattern to the NFA state machine;
+
+  - to show the result NFA in form of a graph;
+
+  - to convert RegExp pattern to the DFA state machine;
+
+  - to show the result DFA in form of a graph;
+
+  - to check a string on a RegExp pattern. In other words the goal of this step is to implement custom RegExp engine. 
+    We already have native RegExp engine in JavaScript, but there is an educational interest.
+    
+
+The solution of the last task consists of multiple steps:
+
+  - parse RegExp pattern into the structure we can use on the next step;
+
+  - convert a result of the parsing process got on the previous step into the NFA sturcture. 
+    On this step we need to implement NFA machine programatically;
+
+  - convert NFA, prepared on the previous step, to the DFA. On this step we need to create programmatical implementation of the DFA machine;
+
+  - run DFA on a string to check it.
+
+
+The good question that can be asked about the previous plan why do we need to build NFA at first and only after that to convert it to the DFA? In other words,
+why not to convert it to the DFA from the very beginning without any intermediate steps? First of all we should understand that each NFA can be easily converted
+to the respective DFA and each DFA can be converted to the respective NFA. Also it's important to note that it's much easier to convert RegExp at first to NFA
+and only after that to convert NFA to DFA. So, and this is the answer why we do it like that - because it's much easier.
+
+
+To convert results of RegExp parsing to NFA, we should know how NFA should be implemented programatically. For that purpose we need at first to declare:
+  - main building blocks it consists of;
+  - how the main building blocks are connected with each other.
+
+And, after that we need to describe the result NFA programatically, using the NFA description, prepared beforehand.
+
+Why is this easier to convert to NFA than to DFA? Because NFA is more descriptive and you can show different branches of transitions from the state
+on the same symbol. With DFA you're restricted with only one path on one symbol, so you don't have freedom to show multiple paths on the same input.
+As result the DFA structure becomes more compex to implement programatically, than NFA structure.
+
+In our case we'll be converting RegExp not to NFA but to epsilon NFA, cause epsilon NFA is even more descriptive than NFA. We can say, that epsilon in NFA
+machine is used to make different NFA branches with transitions on the same symbol to look more clear, verbose and descriptive. Epsilon is used to transit from
+the state to different branches, that start transition with the same symbol; and at the end of the branches it'is used to transit back from different branches to the common state.
+With epsilon transitions it's easy to present, draw and create programmatial version of NFA.
+
+So, one more time, we use epsilon NFA machine but not just NFA.
+
+Each epsilon NFA machine consists of several blocks:
+
+- state (initial, accepting (can be multiple of them), intermediate (can be multiple of them));
+
+- NFA building block; each building block consists of two states, connected together with one of the two possible types of transitions: 
+  epsilon transition and symbol transition. It's would be correct to say, that each NFA machine can be constructed of these NFA building blocks. 
+
+
+So, to describe programatically epsilon NFA machine we should describe programatically every block it consists of.
+
+
+State class.
+
+
+To describe each state of epsilon NFA we will create State class.
+
+State can be accepting and non-accepting. We pass "isAccepting" configuration option to be able to configure State as accepting/non-accepting.
+
+Be default each State will be non-accepting (isAccepting property equals to false). 
+
+Also each State knows about all possible potential transitions on symbol from this state to other states. epsilon NFA allows transitions from
+one state to multiple states on the same symbol. In this case it will be convinient to present transitions programatically as map. The key of 
+this map will contain transition symbol and the value will contain the array of all possible states the original state can transit to.
+
+We will also create one setter to be able to set up the transitions for the state: setTransitionsForSymbol. 
+
+And, we'll create one getter to be able to get the transitions for the symbol for the state: getTransitionsForSymbol.
+
+
+NFA class.
+
+Each complex epsilon NFA machine consists of simple mini NFA machines. Each such mini NFA machine (sub-machine) consists of two states and transition on one
+concrete symbol between these states.
+
+The idea is to describe with NFA class each such small NFA machine. And after that chain all mini NFA together to construct big result NFA machine.
+
+The NFA class gets two configuration options:
+  - input state (instance of the State class, created above);
+  - output state (instance of the State class);
+  - transition from input state to the output state, that is added to the input state with help of setTransitionsForSymbol method of the State instance.
+    The transition is added to the input state.
+
+Basic NFA fragments.
+
+There're 5 basic NFA fragments in total - the first two are the simplest. The last three are compound machines, which are
+built on top of the first two simplest machines.
+
+The process of creating NFA state machine from the building blocks looks like:
+- at first we cobine simples machines into compound machines.
+- after we combine compound machines into more complex machines.
+- after we combine more complex machines, built on the previous step into even more complex machines.
+- the process repeats until we build the whole NFA state machine.
+
+As result the result NFA state machine can be described as the tree, that consists of multiple nodes - states. Each state of this tree
+knows about all possible transitions from this state to another.
+
+The first basic NFA fragment (instance of NFA class) - Single Character Machine.
+
+The second basic NFA fragment - Epsilon machine.
+
+These are the fundemental building blocks for everything else in regular expressions.
+Having different combinations of just these two machines we can build very complex machines: 
+  - concatenation; 
+  - repetition; 
+  - character groups; 
+  - classes
+  and etc.
+
+The third basic NFA fragment (which is compound) is called "contatenation". This fragment concatenates two simplest NFA fragment together.
+
+Let's say we need to build epsilon NFA state machine for the regexp /^ab$/.
+
+This regexp can be presented with one compound NFA state machine, that consists of two simplest NFA fragments: 
+
+1. Single Character Machine for the symbol "a" (input state and the output state are connected with a transition, labeled by "a").
+2. Single Character Machine for the symbol "b" (input state and the output state are connected with a transition, labeled by "b").
+
+When we concatenate these machines together as "a + b", the output state for the first machine is not accepting any more, and
+ouput state of the first machine is connected with the input state of the second machine with the epsilon transition. So, the result compound
+concatenation state machine as only one acceptign state, that belongs to the second simplest machine for the symbol "b". 
+It's important to point out, that for the concatenation of one machine to another we are using epsilon transition. 
+
+
+The third basic NFA fragment is called "union".

@@ -1,0 +1,23 @@
+{
+  "name": "@j.u.p.iter/regexp-machine",
+  "version": "0.0.0-semantically-released",
+  "description": "RegExp machine",
+  "main": "dist/lib/regexp-machine.cjs.js",
+  "module": "dist/lib/regexp-machine.esm.js",
+  "umd:main": "dist/lib/regexp-machine.umd.min.js",
+  "typings": "dist/types",
+  "repository": "git@github.com:j-u-p-iter/regexp-machine.git",
+  "author": "Leontyev Kirill (j.u.p.iter) <pn79122821224@gmail.com> (http://j-u-p-iter.ru/)",
+  "license": "MIT",
+  "scripts": {
+    "commit": "jupiter-scripts precommit --allowJs",
+    "build": "jupiter-scripts build --bundle",
+    "start": "yarn run build --watch",
+    "lint": "jupiter-scripts lint --format codeFrame",
+    "lint:fix": "yarn run lint --fix",
+    "test": "jupiter-scripts test --runInBand"
+  },
+  "devDependencies": {
+    "@j.u.p.iter/jupiter-scripts": "^1.17.0"
+  }
+}
