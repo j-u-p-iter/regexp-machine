@@ -23,11 +23,11 @@ describe('State', () => {
 
       state1.addTransitionForSymbol('a', state2);
 
-      expect(state1.getTransitionForSymbol('a')).toEqual([state2]);
+      expect(state1.getTransitionsForSymbol('a')).toEqual([state2]);
       
       state1.addTransitionForSymbol('a', state3);
 
-      expect(state1.getTransitionForSymbol('a')).toEqual([state2, state3]);
+      expect(state1.getTransitionsForSymbol('a')).toEqual([state2, state3]);
     });
   });
 });

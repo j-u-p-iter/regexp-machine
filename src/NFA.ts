@@ -22,6 +22,6 @@ export class NFA {
    *
    */
   test(characters: string) {
-    this.inputState.test(characters);
+    return this.inputState.test(characters);
   }
 }

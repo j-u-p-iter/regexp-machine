@@ -1,5 +1,5 @@
+import { NFA } from "../NFA";
 import { EPSILON } from "./epsilonMachine";
-import { NFA } from "./NFA";
 
 /***
  * The helper is used to concatenate
@@ -47,7 +47,7 @@ export const concatPair = (firstMachine: NFA, secondMachine: NFA): NFA => {
  *   machine together.
  *
  */
-export const concatMachines = (machines: NFA[]): NFA => {
+export const concatMachines = (...machines: NFA[]): NFA => {
   const restMachines = machines.slice(1);
 
   let nextMachine = machines[0];

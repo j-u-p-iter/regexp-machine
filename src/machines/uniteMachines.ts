@@ -1,6 +1,6 @@
+import { NFA } from "../NFA";
+import { State } from "../State";
 import { EPSILON } from "./epsilonMachine";
-import { NFA } from "./NFA";
-import { State } from "./State";
 /***
  * The helper is used to unite
  *   two machines together ("or" operator). These can be
