@@ -7,7 +7,7 @@ import { EPSILON } from "./epsilonMachine";
  *   Here instead of "a" can be any arbitrary symbol.
  *
  */
-export const repetitionMachine = (fragment: NFA): NFA => {
+export const slowRepetitionMachine = (fragment: NFA): NFA => {
   fragment.outputState.isAccepting = false;
 
   const startingState = new State();
@@ -47,4 +47,22 @@ export const repetitionMachine = (fragment: NFA): NFA => {
     inputState: startingState,
     outputState: acceptingState
   });
+};
+
+export const repetitionMachine = (fragment: NFA): NFA => {
+  /**
+   * Epsilon transition from output state to the input state
+   *   in case there're more than one repetitions.
+   *
+   */
+  fragment.outputState.addTransitionForSymbol(EPSILON, fragment.inputState);
+
+  /**
+   * Epsilon transition straight to the accepting state
+   *   in case the string is empty.
+   *
+   */
+  fragment.inputState.addTransitionForSymbol(EPSILON, fragment.outputState);
+
+  return fragment;
 };

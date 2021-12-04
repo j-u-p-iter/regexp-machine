@@ -62,7 +62,26 @@ export class State {
    *
    *
    */
-  public test(characters: string) {
+  public test(characters: string, visitedStates = new Map()) {
+    /**
+     * It's possible to fall into infinite recursion,
+     *   when you transit between the same states with help
+     *   of epsilon transitions.
+     *
+     * Firs of all it's normal to comeback to the same state
+     *   on epsilon transition. But it's not normal if you
+     *   come to the same state with the same set of characters.
+     *   If it happens it means that you're moving between the same multiple
+     *   states on epsilon transitions. As result we need to break such type
+     *   of transitions not to fall into infinite loop.
+     *
+     */
+    if (visitedStates.get(this) === characters) {
+      return false;
+    }
+
+    visitedStates.set(this, characters);
+
     if (characters.length === 0) {
       /**
        * To resolve the string as accepting
@@ -70,7 +89,7 @@ export class State {
        *   Otherwise:
        *
        *   - there's probably epsilon transition back to
-       *     the previous NFA fragment.
+       *     the previous NFA fragment;
        *
        *   - or probably the string is not accepted,
        *     cause there're more characters, that should
@@ -102,18 +121,12 @@ export class State {
          *   the string is resolved as accepted.
          *
          */
-        if (nextState.test("")) {
+        if (nextState.test("", visitedStates)) {
           return true;
         }
       }
 
       return false;
-    }
-
-    for (const nextState of this.getTransitionsForSymbol(EPSILON)) {
-      if (nextState.test(characters)) {
-        return true;
-      }
     }
 
     const currentSymbol = characters[0];
@@ -125,7 +138,13 @@ export class State {
      *
      */
     for (const nextState of this.getTransitionsForSymbol(currentSymbol)) {
-      if (nextState.test(restCharacters)) {
+      if (nextState.test(restCharacters, visitedStates)) {
+        return true;
+      }
+    }
+
+    for (const nextState of this.getTransitionsForSymbol(EPSILON)) {
+      if (nextState.test(characters, visitedStates)) {
         return true;
       }
     }

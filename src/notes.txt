@@ -205,4 +205,25 @@ concatenation state machine as only one acceptign state, that belongs to the sec
 It's important to point out, that for the concatenation of one machine to another we are using epsilon transition. 
 
 
-The third basic NFA fragment is called "union".
+The fourth basic NFA fragment is called "union".
+
+The important requirement, related to each NFA fragment (simplest and coumpound) is that each fragment have one starting state and only one accepting state.
+
+And state machine for the "union" NFA fragment shows us how epsilon transitions can help us to build such type of fragments.
+
+Let's say we need to build epsilon NFA state machine for the regexpt /^a|b$/.
+
+This regexp can be presented with one compound NFA state machine, that consists of two simples NFA fragments - NFA fragment for single character "a" and 
+NFA fragment for single character "b".
+
+Each of the simplest machine, presented in our union NFA fragment have starting state and accepting state. But our compound NFA fragment should have only one starting and one accepting state.
+
+For this purpose to create union NFA fragment we add two additional states - starting and accepting. We connect new starting state to the staring states
+of single character fragments by epsilon transitions. Also we connect output states of both single character fragments with the accepting state by epsilon
+transitions. Epsilon transitions in this example allows us to present union NFA fragment as constructed with two single characters fragments without 
+changing implementation of these simplest fragments. As result each of the simplest fragments can be replaced with any more complex fragments, because
+they are playing role of a black box abstractions:
+  - the union NFA fragment doesn't care about implementation of the fragments it consists of;
+  - they can be replaced with any another even more complex fragments and the union compound fragment will be working correctly.
+
+The last, fifth, basic NFA fragment is called "Kleene closure": /^a*$/.
