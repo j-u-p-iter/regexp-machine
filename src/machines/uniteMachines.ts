@@ -27,6 +27,8 @@ import { EPSILON } from "./epsilonMachine";
  *     to one common output state, which is the only
  *     accepting state in the whole result united NFA tree.
  *
+ * Creates NFA fragment, related to the next regexp: /^a|b$/.
+ *   Here instead of "a" and "b" can be any arbitrary characters.
  */
 export const unitePair = (firstMachine: NFA, secondMachine: NFA): NFA => {
   /**
@@ -42,17 +44,11 @@ export const unitePair = (firstMachine: NFA, secondMachine: NFA): NFA => {
   secondMachine.outputState.isAccepting = false;
 
   const initialState = new State();
-
   initialState.addTransitionForSymbol(EPSILON, firstMachine.inputState);
-
   initialState.addTransitionForSymbol(EPSILON, secondMachine.inputState);
 
-  const acceptedState = new State({
-    isAccepting: true
-  });
-
+  const acceptedState = new State({ isAccepting: true });
   firstMachine.outputState.addTransitionForSymbol(EPSILON, acceptedState);
-
   secondMachine.outputState.addTransitionForSymbol(EPSILON, acceptedState);
 
   return new NFA({ inputState: initialState, outputState: acceptedState });
@@ -64,8 +60,10 @@ export const unitePair = (firstMachine: NFA, secondMachine: NFA): NFA => {
  *   adding one common input state and one common
  *   output state for all machines.
  *
+ * Creates NFA fragment, related to the next regexp: /^a|b|c|d|e|f|g$/.
+ *   Here instead of "a", "b" and etc. can be any arbitrary characters.
  */
-export const uniteMachines = (machines: NFA[]): NFA => {
+export const uniteMachines = (...machines: NFA[]): NFA => {
   const restMachines = machines.slice(1);
 
   let nextMachine = machines[0];

@@ -19,6 +19,10 @@ import { EPSILON } from "./epsilonMachine";
  *
  *   - adding epsilon transition between output state of the first machine and input
  *     state of the second machine.
+ *
+ * Creates NFA fragment, related to the next regexp: /^ab$/.
+ *   Here instead of "ab" can be any arbitrary set of characters.
+ *
  */
 export const concatPair = (firstMachine: NFA, secondMachine: NFA): NFA => {
   firstMachine.outputState.isAccepting = false;
@@ -45,6 +49,9 @@ export const concatPair = (firstMachine: NFA, secondMachine: NFA): NFA => {
  *   the next machine on top of the previous one,
  *   chaining input and output states of each
  *   machine together.
+ *
+ * Creates NFA fragment, related to the next regexp: /^abcdefg$/.
+ *   Here instead of "abcdefg" can be any arbitrary set of characters.
  *
  */
 export const concatMachines = (...machines: NFA[]): NFA => {

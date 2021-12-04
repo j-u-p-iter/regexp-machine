@@ -64,6 +64,20 @@ export class State {
    */
   public test(characters: string) {
     if (characters.length === 0) {
+      /**
+       * To resolve the string as accepting
+       *   the incoming string should be empty.
+       *   Otherwise:
+       *
+       *   - there's probably epsilon transition back to
+       *     the previous NFA fragment.
+       *
+       *   - or probably the string is not accepted,
+       *     cause there're more characters, that should
+       *     be consumed by machine until the string being
+       *     resolved as accepted. In this case the string is
+       *     not accepted by machine.
+       */
       if (this.isAccepting) {
         /**
          * This is the final destination point.
@@ -79,14 +93,27 @@ export class State {
        *
        */
       for (const nextState of this.getTransitionsForSymbol(EPSILON)) {
-        return nextState.test("");
+        /**
+         * It's not necessary all states to return true in this case.
+         *   But instead it's enough at least one state return true,
+         *   cause there multiple potential branches (NFA fragments),
+         *   that could be tested by machine. If at least one of the
+         *   fragments lead to accepting state on the last string symbol -
+         *   the string is resolved as accepted.
+         *
+         */
+        if (nextState.test("")) {
+          return true;
+        }
       }
 
       return false;
     }
 
     for (const nextState of this.getTransitionsForSymbol(EPSILON)) {
-      return nextState.test(characters);
+      if (nextState.test(characters)) {
+        return true;
+      }
     }
 
     const currentSymbol = characters[0];
@@ -98,7 +125,9 @@ export class State {
      *
      */
     for (const nextState of this.getTransitionsForSymbol(currentSymbol)) {
-      return nextState.test(restCharacters);
+      if (nextState.test(restCharacters)) {
+        return true;
+      }
     }
 
     /**
