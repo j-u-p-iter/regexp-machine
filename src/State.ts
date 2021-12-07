@@ -2,7 +2,17 @@ import { EPSILON } from "./machines/epsilonMachine";
 
 interface StateOptions {
   isAccepting?: boolean;
+  isStarting?: boolean;
+  label?: string | number;
 }
+
+type TransitionCharacter = string;
+
+const flattenArray = map => {
+  return map.reduce((resultMap, item) => {
+    return [...resultMap, ...item];
+  }, []);
+};
 
 /**
  * Class to create state, which is one of the
@@ -15,18 +25,49 @@ interface StateOptions {
 export class State {
   private transitionsMap: Map<string, State[]>;
 
-  constructor({ isAccepting = false }: StateOptions = {}) {
+  /**
+   * State identifier to use in transition table,
+   *   for example.
+   *
+   */
+  private label: string | number;
+
+  constructor({
+    isStarting = false,
+    isAccepting = false,
+    label = ""
+  }: StateOptions = {}) {
     this.isAccepting = isAccepting;
+    this.isStarting = isStarting;
+    this.label = label;
     /**
      * In case of NFA the transition can be done
      *   to multiple next states on one symbol.
      *   This is why we map array of states to each symbol,
      *   but not just one state.
      */
-    this.transitionsMap = new Map<string, State[]>();
+    this.transitionsMap = new Map<TransitionCharacter, State[]>();
   }
 
   public isAccepting: boolean;
+
+  public isStarting: boolean;
+
+  public setLabel(label: string | number): void {
+    this.label = label;
+  }
+
+  public getLabel(): string | number {
+    return this.label;
+  }
+
+  public getAllTransitions(): Map<string, State[]> {
+    return this.transitionsMap;
+  }
+
+  public getAllTransitionsStates(): State[] {
+    return flattenArray(Array.from(this.getAllTransitions().values()));
+  }
 
   public addTransitionForSymbol(symbol: string, state: State): void {
     const currentTransitionForSymbol: State[] =

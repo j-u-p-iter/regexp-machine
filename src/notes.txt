@@ -8,24 +8,22 @@ There're 3 types of state machines:
   Pratcically it means that being in state 1 and consuming symbol "a" there can be multiple potential states to move further.
   Having multiple choises - NFA traverse to all of them to consider maximum accepting paths.
 
-- e-NFA (epsilon NFA). Since it's NFA it again allows multiple transitions from the one state on the same symbol. epsilon transition allows
-  to move from one state to another without consuming a character from a string.
+- e-NFA (epsilon NFA). Since it's NFA it again allows multiple transitions from the one state on the same symbol. Also, there's an epsilon
+transition exists. epsilon transition allows to move from one state to another without consuming a character from a string.
 
 - DFA
-  It's a determenistic FA. It forbids what we allow in NFA and e-NFA:
-   - there is only one transition from one state to another on one symbol;
-   - there is no epsilon transitions.
+  It's a determenistic FA. It forbids what we allow in the NFA and e-NFA:
+    - there is only one transition from one state to another on one symbol;
+    - there is no epsilon transitions.
 
 These state machines are used to implement regular expressions.
 
-
 NFA is more complex than DFA.
-
 
 Each NFA can be converted to the DFA and each DFA can be converted to NFA. 
 
 If DFA is simpler than NFA and each NFA can be converted to DFA, why do we need NFA? The thing is 
-it's simpler to convert RegExp at first to e-NFA, and then eventually to convert e-NFA to DFA, wich in runtime will be much faster to execute.
+it's simpler to convert RegExp at first to e-NFA, and then eventually to convert e-NFA to DFA, which in runtime will be much faster to execute.
 
 So, to represent RegExp as state machine it can be converted to NFA at first and after that it can be 
 converted further to DFA.
@@ -39,7 +37,7 @@ Each state machine has:
   - transitions from one state to another by consuming one symbol from a string.
   - destination state - accepting state.
 
-When we traverse a graph, starting from an initial state, going through all state machine's transitions and reaching an accepting state - 
+When we traverse a graph, starting from a starting state, going through all state machine's transitions and reaching an accepting state - 
 the srtring is accepted.
 
 State Machine is a tupple of 5 elements:
@@ -59,7 +57,8 @@ The first basic machine - Single Character Machine.
 The second basic machine - Epsilon machine.
 
 These are the fundemental building blocks for everything else in regular expressions.
-Having different combinations of just these two machines we can build very complex machines - concatenation, repetition, character groups, classes and etc.
+Having different combinations of just these two machines we can build very complex machines - 
+concatenation, repetition, character groups, classes and etc.
 
 
 
@@ -68,8 +67,8 @@ Having different combinations of just these two machines we can build very compl
 #### RegExp machine ####
 
 State machine, that represents regular expressions literally tells us what symbols in what orders 
-we should take from the string sequentially. If there's such type of symbol in the string the machine tells us to take
-we can go further. If there's not such type of symbol in the string and we haven't reached an accepting state yet,
+we should take from the string sequentially. If the next first symbol in the string the same the machine tells us to take
+we can go further. If the first symbol is another one, or there's no symbol at all in the string and we haven't reached an accepting state yet,
 the string is not satisfied the state machine and as result is not accepted.
 
 
@@ -79,7 +78,7 @@ The goals of the current project are:
 
   - to show the result NFA in form of a graph;
 
-  - to convert RegExp pattern to the DFA state machine;
+  - to convert NFA to the DFA state machine;
 
   - to show the result DFA in form of a graph;
 
@@ -116,9 +115,10 @@ on the same symbol. With DFA you're restricted with only one path on one symbol,
 As result the DFA structure becomes more compex to implement programatically, than NFA structure.
 
 In our case we'll be converting RegExp not to NFA but to epsilon NFA, cause epsilon NFA is even more descriptive than NFA. We can say, that epsilon in NFA
-machine is used to make different NFA branches with transitions on the same symbol to look more clear, verbose and descriptive. Epsilon is used to transit from
-the state to different branches, that start transition with the same symbol; and at the end of the branches it'is used to transit back from different branches to the common state.
-With epsilon transitions it's easy to present, draw and create programmatial version of NFA.
+machine is used to make different NFA branches with transitions on the same symbol to look more clear, verbose and descriptive. Epsilon 
+is used to transit from the state to different branches, that start transition with the same symbol; and at the end of the branches 
+it'is used to transit back from different branches to the common state. With epsilon transitions it's easy to present, draw and create programmatial 
+version of NFA.
 
 So, one more time, we use epsilon NFA machine but not just NFA.
 
@@ -127,14 +127,11 @@ Each epsilon NFA machine consists of several blocks:
 - state (initial, accepting (can be multiple of them), intermediate (can be multiple of them));
 
 - NFA building block; each building block consists of two states, connected together with one of the two possible types of transitions: 
-  epsilon transition and symbol transition. It's would be correct to say, that each NFA machine can be constructed of these NFA building blocks. 
-
+  epsilon transition and symbol transition. It would be correct to say, that each NFA machine can be constructed of these NFA building blocks. 
 
 So, to describe programatically epsilon NFA machine we should describe programatically every block it consists of.
 
-
 State class.
-
 
 To describe each state of epsilon NFA we will create State class.
 
@@ -143,7 +140,7 @@ State can be accepting and non-accepting. We pass "isAccepting" configuration op
 Be default each State will be non-accepting (isAccepting property equals to false). 
 
 Also each State knows about all possible potential transitions on symbol from this state to other states. epsilon NFA allows transitions from
-one state to multiple states on the same symbol. In this case it will be convinient to present transitions programatically as map. The key of 
+one state to multiple states on the same symbol. In this case it will be convinient to present transitions programatically as a map. The key of 
 this map will contain transition symbol and the value will contain the array of all possible states the original state can transit to.
 
 We will also create one setter to be able to set up the transitions for the state: setTransitionsForSymbol. 
@@ -153,15 +150,15 @@ And, we'll create one getter to be able to get the transitions for the symbol fo
 
 NFA class.
 
-Each complex epsilon NFA machine consists of simple mini NFA machines. Each such mini NFA machine (sub-machine) consists of two states and transition on one
-concrete symbol between these states.
+Each complex epsilon NFA machine consists of simple mini NFA machines. Each such mini NFA machine (sub-machine) consists of two states and transition on 
+one concrete symbol between these states.
 
 The idea is to describe with NFA class each such small NFA machine. And after that chain all mini NFA together to construct big result NFA machine.
 
 The NFA class gets two configuration options:
   - input state (instance of the State class, created above);
   - output state (instance of the State class);
-  - transition from input state to the output state, that is added to the input state with help of setTransitionsForSymbol method of the State instance.
+  - transition from input state to the output state, that is added to the input state with help of addTransitionsForSymbol method of the State instance.
     The transition is added to the input state.
 
 Basic NFA fragments.
@@ -170,10 +167,10 @@ There're 5 basic NFA fragments in total - the first two are the simplest. The la
 built on top of the first two simplest machines.
 
 The process of creating NFA state machine from the building blocks looks like:
-- at first we cobine simples machines into compound machines.
-- after we combine compound machines into more complex machines.
-- after we combine more complex machines, built on the previous step into even more complex machines.
-- the process repeats until we build the whole NFA state machine.
+  - at first we cobine simplest machines into compound machines.
+  - after we combine compound machines into more complex machines.
+  - after we combine more complex machines, built on the previous step into even more complex machines.
+  - the process repeats until we build the whole NFA state machine.
 
 As result the result NFA state machine can be described as the tree, that consists of multiple nodes - states. Each state of this tree
 knows about all possible transitions from this state to another.
@@ -183,6 +180,7 @@ The first basic NFA fragment (instance of NFA class) - Single Character Machine.
 The second basic NFA fragment - Epsilon machine.
 
 These are the fundemental building blocks for everything else in regular expressions.
+
 Having different combinations of just these two machines we can build very complex machines: 
   - concatenation; 
   - repetition; 
@@ -227,3 +225,13 @@ they are playing role of a black box abstractions:
   - they can be replaced with any another even more complex fragments and the union compound fragment will be working correctly.
 
 The last, fifth, basic NFA fragment is called "Kleene closure": /^a*$/.
+
+
+
+
+{
+  [stateLabel]: {
+    symbols: string[],
+    states: State[], 
+  } 
+}
