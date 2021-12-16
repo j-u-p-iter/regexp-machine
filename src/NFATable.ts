@@ -2,6 +2,12 @@ import { EPSILON } from "./machines/epsilonMachine";
 import { NFA } from "./NFA";
 import { State } from "./State";
 
+export const EPSILON_CLOSURE_COLUMN_NAME = `${EPSILON}*`;
+
+export const getStartingRowLabel = rowLabel => `->${rowLabel}`;
+
+export const getAcceptingRowLabel = rowLabel => `*${rowLabel}`;
+
 /**
  * Each Transition Table Row
  *   consists of columns. Each column is a map
@@ -26,6 +32,8 @@ interface NFATransitionTable {
 }
 
 export class NFATable {
+  private table;
+
   constructor(private nfa: NFA) {}
 
   public getColumns() {
@@ -38,6 +46,44 @@ export class NFATable {
 
   public getAcceptingState() {
     return this.nfa.outputState.getLabel();
+  }
+
+  public getStartingStateEpsilonClosure() {
+    return this.getRowEpsilonClosure(this.getStartingState());
+  }
+
+  public getRowEpsilonClosure(rowLabel) {
+    if (!this.table) {
+      throw new Error("You should create table at first.");
+    }
+
+    return this.getRowColumns(rowLabel)[EPSILON_CLOSURE_COLUMN_NAME];
+  }
+
+  /**
+   * rowLabel can be suffixed with the "->" symbol
+   *   in case it's related to the starting state;
+   *   also it can be suffixed with "*" symbol in case
+   *   it's related to the accepting state.
+   *
+   *   The result is an array,
+   *     cause it can contain multiple states,
+   *     because nfa allows multiple transitions on the same symbol.
+   *
+   *   The column should always exist in the table for the stateLabel.
+   *     So it doesn't make sence to check it's presense further in the code.
+   *
+   */
+  public getRowColumns(rowLabel: string) {
+    if (!this.table) {
+      throw new Error("You should create table at first.");
+    }
+
+    return (
+      this.table[rowLabel] ||
+      this.table[getAcceptingRowLabel(rowLabel)] ||
+      this.table[getStartingRowLabel(rowLabel)]
+    );
   }
 
   public create(): NFATransitionTable {
@@ -81,6 +127,8 @@ export class NFATable {
         };
       }, {});
 
-    return resultTable;
+    this.table = resultTable;
+
+    return this.table;
   }
 }

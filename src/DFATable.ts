@@ -1,4 +1,3 @@
-import { EPSILON } from "./machines/epsilonMachine";
 import { NFATable } from "./NFATable";
 
 interface DFATransitionTableColumns {
@@ -13,17 +12,14 @@ export class DFATable {
   constructor(private nfaTable: NFATable) {}
 
   public create(): DFATransitionTable {
-    const nfaTransitionTable = this.nfaTable.create();
+    this.nfaTable.create();
 
     /**
      * Starting state of the DFA is the epsilon closure
      *   of the starting state of the NFA (NFA has only one starting state).
      * DFA has only one starting state as NFA.
      */
-    const dfaStartingState =
-      nfaTransitionTable[`->${this.nfaTable.getStartingState()}`][
-        `${EPSILON}*`
-      ];
+    const dfaStartingState = this.nfaTable.getStartingStateEpsilonClosure();
 
     /**
      * In the original DFA table the states labels are represented as
@@ -83,23 +79,7 @@ export class DFATable {
         let mergedStates = [];
 
         for (const stateLabel of dfaStatesLabels) {
-          /**
-           * nfaState label can be suffixed with "->" symbol
-           *   in case it's related to the starting state;
-           *   also it can be suffixed with "*" symbol in case it's related to the accepting state.
-           *
-           *   The result statesFromNFA is an array,
-           *     cause it contains multiple states,
-           *     because nfa allows multiple transitions on the same symbol.
-           *
-           *   The column should always exist in the table for the stateLabel.
-           *     So it doesn't make sence to check it's presense further in the code.
-           */
-          const nfaTableColumns =
-            nfaTransitionTable[stateLabel] ||
-            nfaTransitionTable[`->${stateLabel}`] ||
-            nfaTransitionTable[`*${stateLabel}`];
-
+          const nfaTableColumns = this.nfaTable.getRowColumns(stateLabel);
           /**
            * The column for each character in the alphabet
            *   is an empty array be default.
@@ -123,7 +103,7 @@ export class DFATable {
           for (const nextStateLabel of nextStatesOnCharacterTransition) {
             epsilonClosureForNextStates = [
               ...epsilonClosureForNextStates,
-              ...nfaTransitionTable[nextStateLabel][`${EPSILON}*`]
+              ...this.nfaTable.getRowEpsilonClosure(nextStateLabel)
             ];
           }
 
