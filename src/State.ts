@@ -26,8 +26,18 @@ export class State {
   private transitionsMap: Map<string, State[]>;
 
   /**
-   * State identifier to use in transition table,
-   *   for example.
+   * State identifier to use in transition table, for example.
+   *
+   *   It's not necessary to set up
+   *   label for the State (this is why this parameter
+   *   is optional). But it makes the visualisation
+   *   of state machine more clear and precise if
+   *   it's set up.
+   *
+   *   On the step of creation transition tables and
+   *   graphs the label for the State the table/graph
+   *   contains is set up aumatically (if there's no predefined label
+   *   for it).
    *
    */
   private label: string | number;

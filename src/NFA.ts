@@ -1,31 +1,6 @@
 import { EPSILON } from "./machines/epsilonMachine";
 import { State } from "./State";
 
-/**
- * Each Transition Table Row
- *   consists of columns. Each column is a map
- *   between the transition symbol and the state
- *   that transition symbol leads to.
- *
- * Also row
- */
-interface NFATransitionTableRow {
-  columns: {
-    [key: string]: Array<State["label"]>;
-  };
-}
-
-/**
- * NFA transition table consists rows,
- *   labeled with State label.
- *   Each row shows the states the
- *   state, the row labeled by, can transit to.
- *
- */
-interface NFATransitionTable {
-  [key: string]: NFATransitionTableRow;
-}
-
 interface NFAOptions {
   inputState: State;
   outputState: State;
@@ -49,6 +24,7 @@ export class NFA {
      */
 
     let resultAlphabet = new Set<string>();
+    const visitedStates = new Set<State>();
 
     const getAlphabet = (state = this.inputState) => {
       resultAlphabet = new Set([
@@ -59,6 +35,12 @@ export class NFA {
       const nextStates = state.getAllTransitionsStates();
 
       for (const nextState of nextStates) {
+        if (visitedStates.has(nextState)) {
+          return;
+        }
+
+        visitedStates.add(nextState);
+
         getAlphabet(nextState);
       }
     };
@@ -95,7 +77,7 @@ export class NFA {
          *
          */
         if (visitedState.has(state)) {
-          return statesWithLabel;
+          return resultMap;
         }
 
         visitedState.add(state);
@@ -113,36 +95,5 @@ export class NFA {
     };
 
     return setLabelsForStates();
-  }
-
-  public getTransitionTable(): NFATransitionTable {
-    const alphabet = this.getAlphabet();
-
-    const resultTable = this.setLabelsForStates().reduce((table, rowState) => {
-      const stateLabel = rowState.getLabel();
-      const rowLabel = rowState.isStarting
-        ? `->${stateLabel}`
-        : rowState.isAccepting
-        ? `*${stateLabel}`
-        : stateLabel;
-
-      const columns = [...alphabet, EPSILON].reduce((rowColumns, character) => {
-        const columnName = character === EPSILON ? `${EPSILON}*` : character;
-
-        return {
-          ...rowColumns,
-          [columnName]: rowState
-            .getTransitionsForSymbol(character)
-            .map(state => state.getLabel())
-        };
-      }, {});
-
-      return {
-        ...table,
-        [rowLabel]: columns
-      };
-    }, {});
-
-    return resultTable;
   }
 }

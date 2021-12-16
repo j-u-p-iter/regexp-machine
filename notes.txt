@@ -1,0 +1,139 @@
+Determenistic Finite State FA (DFSA or DFA).
+
+On each input there's one and only one state to which automaton can transition from it's current state.
+
+There're multiple things to point out:
+- there's maximum one state to transition. The result of transition depends not only on the state, but also on the 
+  input symbol. The transition happens only if the automaton can transition on this/that input symbol.
+
+- the transition maximum goes to one next state. But there can be multiple input symbol transition happens 
+  from the current state but not the only one.
+
+DFA is described by five parameters (set of five parameters). In a formal way we say, that DFA is a tuple of five elements.
+
+Let's say we have A DFA (A is the name of DFA). Than A is a tuple of five paramers:
+
+A = (Q, Σ, δ, q0, F).
+
+DFA parameters:
+
+1. Q - finite set of states. There're three possible types of states: initial (starting), accepting, intermediate. There're always
+   starting and accepting state. Depending on the DFA the intermediate state can exist or not.
+
+2. Σ - finite set of input symbols (it's called alphabet). This is the set of all symbols, participating in transition from one state to another.
+
+3. δ - transition function. This is a function, that takes as arguments a state and input symbol and returns a state, the 
+   transition goes to from the previous state on an input symbol.
+
+   If q is a state and a is a symbol, than δ(q, a) returns state p. In the graph, that represents the automaton, there is
+   an arc from q to p labeled a.
+
+4. q0 - start state. It's one of the states of Q. Or we say it belongs to the Q set and write like q∈Q.
+
+5. F - set of final or accepting (more common) states - F∈Q.
+
+DFA transition graph (diagram).
+
+1. Each state of a diagram is a node.
+
+2. If we have a state q, that belongs to Q (q∈Q) and a symbol, that belongs to alphabet Σ (a∈Σ), than the transition
+   graph has an arrow from q to p, labeled a.
+
+3. There is an arrow, that goes from nowhere to the starting state q0.
+
+4. Nodes corresponding to final states are marked with double circle.
+
+
+DFA transition table.
+
+1. This is a tabular presentation of a transition function.
+
+2. The rows of the table correspond to the states and the columns correspond to the input symbols.
+
+3. Let's say the cell of the table contains state p. The row this cell belongs to is q and the column is a.
+   In this case the p is the state the DFA transition from state q on a symbol a: δ(q, a) = p.
+
+
+Extended transition function.
+
+Each DFA defines some language - the set of all strings that result in a sequence of state transitions from the start
+state to an accepting state.
+
+If the simple transition function (δ) describes the transition from one state to another on one particular symbol,
+the extended transition function (^δ) describes the transition from one state to another on a string (sequence of symbols).
+
+In other words it describes what happens when we start in any state an follow any sequence of inputs.
+
+The extended transition function is a function that takes a state q and a string w and returns a state p. p is the state that
+the automaton reaches when starting in state q and processing the sequence of symbols the w string consists of.
+
+
+e-NFA to DFA conversion.
+
+Several things to take into account.
+
+1. e-NFA has epsilon transitions. DFA doesn't have. As result during conversion the e-transition will be eliminated.
+
+2. if the state is connected with the near states by e-transitions we say, that this state has e-closure. e-closure is the
+set of states the current state can reach, using only e-transitions. e-closure includes the current states itself. We need e-closure
+abstraction to make conversion from NFA to DFA possible. It's just an abstract tool or term, that make such conversion possible.
+
+Epsilon closure for a given state X is a set of states which can be reached from the states X with only (null) or
+ε moves including the state X itself. In other words, ε-closure for a state can be obtained by union operation of 
+the ε-closure of the states which can be reached from X with a single ε move in recursive manner.
+
+To denote e-closure we write like: ∈ closure(A) : {A, B, C}. It means, that the ∈-closure of the state A is the set of states
+A (always includes itself), B and C (includes all states, that you can reach from the state A, only following by ∈-transitions).
+
+3. e-closure for the starting state of NFA is a starting state of the result DFA. In other words, the starting state
+of the result DFA is the e-closure, that includes starting state of the original NFA. Here we come to very important concept,
+that set of states of NFA plays role as a single state in the result DFA. We can say, that during convertation of NFA to DFA
+set of states of NFA is merged together to represent one state of the DFA.
+
+4. The previous concept, when set of states of NFA represent one single state of DFA is not related only to e-closure, but 
+also to other set of states.
+
+5. The main goal during NFA to DFA convertation is to find set of states DFA by merging subsets of NFA states together.
+
+6. The result construction of DFA table some states of which can consist of subsets of states of the original NFA is 
+called as a Subset Construction (one more very important abbriviation).
+
+7. Sets of states of the result DFA table, that contain at least one accepting state from the original NFA table is
+   an accepting state of the result DFA.
+
+The steps to convert e-NFA to DFA are the follows:
+
+1. Create NFA table.
+
+2. Take e-closure for the starting state of NFA as the beginning state of the result DFA table. On this step
+   you should create the base form of the future DFA table with the first row, denoted by the starting state, like:
+   {A, B, C}, where A, B, C - e-closure of the NFA (with A as a starting state) and with the cells, denoted by the 
+   all transition symbols, that belongs to the NFA alphabet.
+
+3. Using the starting state, found on the previous step, find the next DFA states by following from the 
+   starting state on each symbol of the DFA table (denoted in it's columns). Add these states to the 
+   respective cells of the DFA table. On this step you should have one finished row for the DFA table with
+   starting state in the row label (marked with -> as a starting state) and with set of transitioning states from the
+   starting state for each transitioning symbol in respective cells.
+
+   Let's say we have two symbols a and b. The transitions from the starting state can be described
+   by next transition functions.
+
+   δ({A, B, C}, a) = {M, N}   
+   δ({A, B, C}, b) = {D, E, F}
+
+   As result the new states of the DFA was found - {M, N} and { D, E, F }. One more time. Despite the fact, that these
+   sets of states contain multiple states in the result DFA graph these states will be denoted as two separate states,
+   because we merge sets {M, N} and {D, E, F} into let's ay X and Y states respectively.
+
+4. Now we continue expanding DFA table with the transitining states, found on the previous step.
+   We create new rows for each new state and mark each row with labels, containing the states, found previously.
+
+5. After that we repeat step 3 and search for new states (if there are) of the DFA. If new states are found 
+   we put them into the new rows (repeating the step 4), expanding the table and repeat the 3rd step again until all
+   states are found.
+
+6. On the last step we have fully fulfilled a DFA table. The only thing has left is to mark all states of the result DFA
+   table, that sits in the rows headers and which contain at least one accepting state of the original NFA as accepting. 
+
+And, the NFA table is successfully converted to the respective DFA table.

@@ -48,46 +48,4 @@ describe('NFA', () => {
       expect(machine.getAlphabet()).toEqual(['c', 'b', 'a'])
     });
   });
-
-  describe('getTransitionTable', () => {
-    it('returns correct table', () => {
-      expect(getDefaultNFA().getTransitionTable()).toEqual({
-        '->q0': {
-          x: [],
-          y: [],
-          'ε*': ['q1', 'q3']
-        },
-
-        'q1': {
-          x: ['q2'],
-          y: [],
-          'ε*': [],
-        },
-
-        'q2': {
-          x: [],
-          y: [],
-          'ε*': [`q5`],
-        },
-
-        'q3': {
-          x: [],
-          y: ['q4'],
-          'ε*': [],
-        },
-
-        'q4': {
-          x: [],
-          y: [],
-          'ε*': ['q5'],
-        },
-
-        '*q5': {
-          x: [],
-          y: [],
-          'ε*': [],
-        },
-      });
-    });
-  });
 });
