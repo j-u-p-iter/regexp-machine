@@ -19,14 +19,14 @@ export class DFATable {
      *   of the starting state of the NFA (NFA has only one starting state).
      * DFA has only one starting state as NFA.
      */
-    const dfaStartingState = this.nfaTable.getStartingStateEpsilonClosure();
+    const dfaStartingStateEpsilonClosure = this.nfaTable.getStartingStateEpsilonClosure();
 
     /**
      * In the original DFA table the states labels are represented as
      *   the set of states labels of the NFA.
      *
      */
-    const dfaStartingStateLabel = dfaStartingState.join(",");
+    const dfaStartingStateLabel = dfaStartingStateEpsilonClosure.join(",");
 
     /**
      * dfaStates is a dynamic set of dfa table row labels.
@@ -51,6 +51,9 @@ export class DFATable {
 
     const dfaTransitionTable = {};
 
+    const nfaAcceptingState = this.nfaTable.getAcceptingState();
+    const nfaStartingState = this.nfaTable.getStartingState();
+
     dfaStates.forEach(rowLabel => {
       /**
        * Adds table row.
@@ -59,7 +62,22 @@ export class DFATable {
        *
        */
       const dfaStatesLabels = rowLabel.split(",");
-      dfaTransitionTable[rowLabel] = {};
+
+      /**
+       * If the rowLabel contains the NFA starting state,
+       *   than this row is related to the DFA starting state.
+       *
+       * If the rowLabel contains the NFA accepting state,
+       *   than this row is related to the DFA accepting state.
+       *
+       */
+      const resultRowLabel = rowLabel.includes(String(nfaStartingState))
+        ? `->${rowLabel}`
+        : rowLabel.includes(String(nfaAcceptingState))
+        ? `*${rowLabel}`
+        : rowLabel;
+
+      dfaTransitionTable[resultRowLabel] = {};
 
       /**
        * Adds table columns.
@@ -127,7 +145,7 @@ export class DFATable {
          * Removes duplicates from an array and sort it alphabetically,
          *   cause the order of the states doesn't matter.
          */
-        dfaTransitionTable[rowLabel][character] =
+        dfaTransitionTable[resultRowLabel][character] =
           Array.from(new Set(mergedStates))
             .sort()
             .join(",") || null;
@@ -138,7 +156,7 @@ export class DFATable {
          *   be added on one of the next iteration steps.
          *
          */
-        const newDFAState = dfaTransitionTable[rowLabel][character];
+        const newDFAState = dfaTransitionTable[resultRowLabel][character];
 
         /**
          * We don't add the DFA state (subset of NFA states) to the dfaStates Set

@@ -48,15 +48,15 @@ describe('DFATable', () => {
     const dfaTable = getDFATable();
 
     expect(dfaTable.create()).toEqual({
-      "q0,q1,q3": {
+      "->q0,q1,q3": {
         a: "q2,q5", 
         b: "q4,q5",
       }, 
-      "q2,q5": {
+      "*q2,q5": {
         a: null, 
         b: null
       }, 
-      "q4,q5": {
+      "*q4,q5": {
         a: null, 
         b: null
       }
