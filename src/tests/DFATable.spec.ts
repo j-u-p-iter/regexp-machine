@@ -44,22 +44,45 @@ describe('DFATable', () => {
     }
   });
 
-  it('returns correct alphabet', () => {
-    const dfaTable = getDFATable();
+  describe('dfaTable.getOriginalTable', () => {
+    it('returns correct table', () => {
+      const dfaTable = getDFATable();
 
-    expect(dfaTable.create()).toEqual({
-      "->q0,q1,q3": {
-        a: "q2,q5", 
-        b: "q4,q5",
-      }, 
-      "*q2,q5": {
-        a: null, 
-        b: null
-      }, 
-      "*q4,q5": {
-        a: null, 
-        b: null
-      }
-    });
+      expect(dfaTable.getOriginalTable()).toEqual({
+        "->q0,q1,q3": {
+          a: "q2,q5", 
+          b: "q4,q5",
+        }, 
+        "*q2,q5": {
+          a: null, 
+          b: null
+        }, 
+        "*q4,q5": {
+          a: null, 
+          b: null
+        }
+      });
+    })
+  })
+
+  describe('dfaTable.getTableWithMergedLabels', () => {
+    it('returns correct table', () => {
+      const dfaTable = getDFATable();
+
+      expect(dfaTable.getTableWithMergedLabels()).toEqual({
+        "->q0": {
+          a: "q2", 
+          b: "q1",
+        }, 
+        "*q1": {
+          a: null, 
+          b: null
+        }, 
+        "*q2": {
+          a: null, 
+          b: null
+        }
+      });
+    })
   })
 });

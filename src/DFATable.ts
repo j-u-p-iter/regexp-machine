@@ -9,9 +9,23 @@ interface DFATransitionTable {
 }
 
 export class DFATable {
+  /**
+   * Here we cache the table not to construct it on every
+   *   call from scratch.
+   *
+   */
+  private originalTable: DFATransitionTable | null = null;
+
+  private tableWithMergedLabels: DFATransitionTable | null = null;
+
   constructor(private nfaTable: NFATable) {}
 
-  public create(): DFATransitionTable {
+  /**
+   * Creates an original transition table, where state labels
+   *   are combined from NFA label states.
+   *
+   */
+  private create(): DFATable {
     this.nfaTable.create();
 
     /**
@@ -175,6 +189,92 @@ export class DFATable {
       dfaStates.delete(rowLabel);
     });
 
-    return dfaTransitionTable;
+    this.originalTable = dfaTransitionTable;
+
+    return this;
+  }
+
+  private mergeLabels() {
+    const originalTableStatesLabels = Object.keys(this.originalTable);
+
+    const originalToMergedLabelMap = originalTableStatesLabels.reduce(
+      (resultMap, originalLabel, index) => {
+        const isAcceptingState = originalLabel.includes("*");
+        const isStartingState = originalLabel.includes("->");
+
+        const newLabel = `q${index}`;
+
+        resultMap[originalLabel] = {
+          rowLabel: isAcceptingState
+            ? `*${newLabel}`
+            : isStartingState
+            ? `->${newLabel}`
+            : newLabel,
+          columnLabel: newLabel
+        };
+
+        return resultMap;
+      },
+      {}
+    ) as any;
+
+    this.tableWithMergedLabels = Object.entries(this.originalTable).reduce(
+      (resultTable, [rowLabel, columns]) => {
+        const columnsWithMergedLabels = Object.entries(columns).reduce(
+          (resultColumns, [columnName, stateLabel]) => {
+            resultColumns[columnName] =
+              originalToMergedLabelMap[stateLabel]?.columnLabel ||
+              originalToMergedLabelMap[`->${stateLabel}`]?.columnLabel ||
+              originalToMergedLabelMap[`*${stateLabel}`]?.columnLabel ||
+              null;
+
+            return resultColumns;
+          },
+          {}
+        );
+
+        resultTable[
+          originalToMergedLabelMap[rowLabel].rowLabel
+        ] = columnsWithMergedLabels;
+
+        return resultTable;
+      },
+      {}
+    );
+
+    return this.tableWithMergedLabels;
+  }
+
+  /**
+   * Returns an original DFA table, where all states labels
+   *   are combined states labels of the original NFA table.
+   *
+   */
+  public getOriginalTable() {
+    if (this.originalTable) {
+      return this.originalTable;
+    }
+
+    this.create();
+
+    return this.originalTable;
+  }
+
+  public getTableWithMergedLabels() {
+    if (this.tableWithMergedLabels) {
+      return this.tableWithMergedLabels;
+    }
+
+    if (!this.originalTable) {
+      this.create();
+    }
+
+    this.mergeLabels();
+
+    return this.tableWithMergedLabels;
+  }
+
+  public getMinimizedTable() {
+    return this.originalTable;
   }
 }
