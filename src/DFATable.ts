@@ -1,3 +1,4 @@
+import { DFAMinimizer } from "./DFAMinimizer";
 import { NFATable } from "./NFATable";
 
 interface DFATransitionTableColumns {
@@ -275,6 +276,8 @@ export class DFATable {
   }
 
   public getMinimizedTable() {
-    return this.originalTable;
+    const dfaMinimizer = new DFAMinimizer();
+
+    return dfaMinimizer.minimize(this.getTableWithMergedLabels());
   }
 }

@@ -13,7 +13,6 @@ is to execute it.
 
 The DFA minimization is based on the Equivalence Theorem.
 
-
 At first we need to create :
   - the array of levels of equivalence; 
   - the 0-equivalence level. This level includes two states subtests:
@@ -27,22 +26,25 @@ the DFA is minimized, when the equivalence levels are absolutely identical. It m
 finished, cause there's no way to to minimize subsets of states further.
 
 So, we start to iterate throug equivalence levels (array of arrays of arrays). The external array is an array of levels,
-the inner array is the array of states subsets and the inner array is the array of states.
+the inner array is the array of subsets of states and the inner array is the array of states.
 
 The first thing we do, iterating through the arrays of arrays of subsets of states is create the next equivalence level - add new
-empty array into the current array of subsets. After that we iterate through the array of subsets. Inside of this loop we 
-create one more another loop to iterate through array of states. We take the first state from the first subset of states
-of the previous equivalence level and iterate through array of subsets of states on the current level. Our goal during 
+empty array into the current array of subsets. After that we iterate through the array of subsets. So, iterating thgough the 
+first equivalence level, we create the second one.
+
+Inside of this loop we create one more another loop to iterate through array of states. We take the first state from 
+the first subset of states of the previous equivalence level and iterate through array of subsets of states on the 
+current level. Our goal during 
 this loop is to compare the current state from the previous level with first state of as maximum each subset of the current
 equivalence level. If state from the previous level is equivalent to at least one state from one of the subsets of the
 current level we say that the state from the previous level is equivalent to the whole subset of the current level. If the 
 state is equivalent to the states of the subset we add this state to this subset. The state can be equivalent only
 to one of the subsets of the current level. If we find the equivalent subset we should break the current loop throgh 
 the subsets of states of the current level and take the next state from one of the subsets of the previous level.
-If the subset on the previous level contains only one state, we don't need to iterate through the subsets of the current level,
-cause it can be equivalent only to itself. In this case we just should create the subset, that contains only one state on 
-the current level. If the state from the previous level is not equivalent to any of the states of the subsets on the current
-level - we should create new subset on the current level and put this state there.
+If the subset on the previous level contains only one state, we don't need to iterate through the subsets of the current 
+level, cause it can be equivalent only to itself. In this case we just should create the subset, that contains only 
+one state on  the current level. If the state from the previous level is not equivalent to any of the states of 
+the subsets on the current level - we should create new subset on the current level and put this state there.
 
 After we finish iterating through all subsets of states of the previous level we compare the last two 
 equivalence levels. If they are completely equal we break the loop. The result array of levels of equivalence,

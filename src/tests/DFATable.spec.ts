@@ -73,16 +73,16 @@ describe('DFATable', () => {
         "->q0": {
           a: "q2", 
           b: "q1",
-        }, 
+        },
         "*q1": {
           a: null, 
           b: null
-        }, 
+        },
         "*q2": {
           a: null, 
           b: null
         }
       });
     })
-  })
+  });
 });
