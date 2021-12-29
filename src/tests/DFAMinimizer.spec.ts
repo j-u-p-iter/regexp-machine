@@ -1,7 +1,7 @@
 import { DFAMinimizer } from '../DFAMinimizer';
 
 describe('DFAMinimizer', () => {
-  describe('dfaTable.minimize', () => {
+  describe('dfaMinimizer.minimize', () => {
     it('returns correct states', () => {
       const dfaMinimizer = new DFAMinimizer();
 
@@ -20,7 +20,7 @@ describe('DFAMinimizer', () => {
     });
   });
 
-  describe('dfaTable.minimize', () => {
+  describe('dfaMinimizer.minimize', () => {
     it('returns correct states', () => {
       const dfaMinimizer = new DFAMinimizer();
 
@@ -36,7 +36,7 @@ describe('DFAMinimizer', () => {
     });
   });
 
-  describe('dfaTable.minimize', () => {
+  describe('dfaMinimizer.minimize', () => {
     it('returns correct states', () => {
       const dfaMinimizer = new DFAMinimizer();
 
@@ -49,7 +49,7 @@ describe('DFAMinimizer', () => {
     });
   });
 
-  describe('dfaTable.minimize', () => {
+  describe('dfaMinimizer.minimize', () => {
     it('returns correct states', () => {
       const dfaMinimizer = new DFAMinimizer();
 
@@ -62,6 +62,25 @@ describe('DFAMinimizer', () => {
       })).toEqual({
         "->1": { a: "2", b: "2", c: "2", d: "2" },
         "*2": { a: null, b: null, c: null, d: null },
+      });
+    });
+  });
+
+  describe('dfaMinimizer.minimize', () => {
+    it('returns correct states', () => {
+      const dfaMinimizer = new DFAMinimizer();
+
+      expect(dfaMinimizer.minimize({
+        "->q0": { a: "q1", b: "q2" },
+        "q1": { a: "q1", b: "q3" },
+        "q2": { a: "q1", b: "q2" },
+        "q3": { a: "q1", b: "q4" },
+        "*q4": { a: "q1", b: "q2" },
+      })).toEqual({
+        "->q0": { a: "q1", b: "q0" },
+        "q1": { a: "q1", b: "q3" },
+        "q3": { a: "q1", b: "q4" },
+        "*q4": { a: "q1", b: "q0" },
       });
     });
   });

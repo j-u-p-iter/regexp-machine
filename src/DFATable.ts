@@ -195,8 +195,30 @@ export class DFATable {
     return this;
   }
 
-  private mergeLabels() {
-    const originalTableStatesLabels = Object.keys(this.originalTable);
+  /**
+   * If there is a gap between the states,
+   *   we remove this gap renaming the labels.
+   *   For example, we have the next states
+   *   in the table: q0, q2, q3, q4, q5.
+   *
+   *   Here we don't have q1 state. As result
+   *   we have a gap between the q0 and q2.
+   *
+   *   Renaming the labels we're removing this gap
+   *     and get the next set of states:
+   *     q0, q1, q2, q3, q4.
+   *
+   *
+   * The original table can contain complex state labels,
+   *   like "q1,q2,q3".
+   *
+   *   In this case our goal is to merge all the labels
+   *     the complex state labels consist of into
+   *     common one: "q1,q2,q3" => "q1".
+   *
+   */
+  private renameLabels(originalTable) {
+    const originalTableStatesLabels = Object.keys(originalTable);
 
     const originalToMergedLabelMap = originalTableStatesLabels.reduce(
       (resultMap, originalLabel, index) => {
@@ -219,7 +241,7 @@ export class DFATable {
       {}
     ) as any;
 
-    this.tableWithMergedLabels = Object.entries(this.originalTable).reduce(
+    return Object.entries(originalTable).reduce(
       (resultTable, [rowLabel, columns]) => {
         const columnsWithMergedLabels = Object.entries(columns).reduce(
           (resultColumns, [columnName, stateLabel]) => {
@@ -242,8 +264,6 @@ export class DFATable {
       },
       {}
     );
-
-    return this.tableWithMergedLabels;
   }
 
   /**
@@ -270,7 +290,7 @@ export class DFATable {
       this.create();
     }
 
-    this.mergeLabels();
+    this.tableWithMergedLabels = this.renameLabels(this.originalTable);
 
     return this.tableWithMergedLabels;
   }
@@ -278,6 +298,8 @@ export class DFATable {
   public getMinimizedTable() {
     const dfaMinimizer = new DFAMinimizer();
 
-    return dfaMinimizer.minimize(this.getTableWithMergedLabels());
+    return this.renameLabels(
+      dfaMinimizer.minimize(this.getTableWithMergedLabels())
+    );
   }
 }
