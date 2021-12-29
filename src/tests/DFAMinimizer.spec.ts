@@ -49,7 +49,7 @@ describe('DFAMinimizer', () => {
     });
   });
 
-  describe.only('dfaTable.minimize', () => {
+  describe('dfaTable.minimize', () => {
     it('returns correct states', () => {
       const dfaMinimizer = new DFAMinimizer();
 
